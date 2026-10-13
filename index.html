@@ -648,9 +648,9 @@ const url =
       });
       status.textContent =
         "Showing the top " + Math.min(players.length, 10) +
-        " players for " +
-        teamSelect.options[teamSelect.selectedIndex].text +
-        " (2025–26 season).";
+" players for " +
+teamSelect.options[teamSelect.selectedIndex].text +
+" — 2025–26 per-game averages.";
     } catch (error) {
       console.error("Player stats error:", error);
       status.textContent =
