@@ -635,15 +635,36 @@ const url =
           (player.position || "Position unavailable") +
           " • " + (player.games ?? "—") + " games";
         card.appendChild(details);
-        const stats = document.createElement("p");
-        stats.style.whiteSpace = "pre-line";
-        stats.textContent =
-          "PTS: " + (player.points ?? "—") +
-          " | REB: " + (player.totalRb ?? "—") +
-          " | AST: " + (player.assists ?? "—") +
-          "\nSTL: " + (player.steals ?? "—") +
-          " | BLK: " + (player.blocks ?? "—");
-        card.appendChild(stats);
+        
+const stats = document.createElement("p");
+stats.style.whiteSpace = "pre-line";
+stats.style.lineHeight = "1.8";
+
+const gamesPlayed = Number(player.games);
+
+function average(total) {
+  const value = Number(total);
+  if (
+    total == null ||
+    total === "" ||
+    !Number.isFinite(value) ||
+    !Number.isFinite(gamesPlayed) ||
+    gamesPlayed <= 0
+  ) {
+    return "—";
+  }
+  return (value / gamesPlayed).toFixed(1);
+}
+
+stats.textContent =
+  "PTS/G: " + average(player.points) +
+  " | REB/G: " + average(player.totalRb) +
+  " | AST/G: " + average(player.assists) +
+  "\nSTL/G: " + average(player.steals) +
+  " | BLK/G: " + average(player.blocks);
+
+card.appendChild(stats);
+
         results.appendChild(card);
       });
       status.textContent =
