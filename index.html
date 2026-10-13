@@ -594,8 +594,8 @@ function renderRecords() {
     loadButton.disabled = true;
     try {
       const url =
-        "https://api.server.nbaapi.com/api/playertotals?season=2025&page=1&pageSize=100&sortBy=points&ascending=false&team=" +
-        encodeURIComponent(teamSelect.value);
+  "https://api.server.nbaapi.com/api/playertotals?season=2025&page=1&pageSize=10&sortBy=points&ascending=false&team=" +
+  encodeURIComponent(teamSelect.value);
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Stats request failed: " + response.status);
