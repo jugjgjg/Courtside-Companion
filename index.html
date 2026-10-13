@@ -657,7 +657,10 @@ function renderRecords() {
       loadButton.disabled = false;
     }
   }
-  loadButton.addEventListener("click", loadStats);
+  loadButton.addEventListener("click", function () {
+  status.textContent = "Button works! Starting player stats...";
+  loadStats();
+});
 })();
 </script>
 
