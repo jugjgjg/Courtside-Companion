@@ -580,93 +580,74 @@ function renderRecords() {
 
 <script>
 (function () {
-  const teamSelect = document.getElementById("csa-team-select");
   const loadButton = document.getElementById("csa-load-stats");
   const status = document.getElementById("csa-stats-status");
   const results = document.getElementById("csa-stats-results");
-
-  if (!teamSelect || !loadButton || !status || !results) return;
-
-  function addText(parent, tag, text, style) {
-    const element = document.createElement(tag);
-    element.textContent = text;
-    if (style) element.style.cssText = style;
-    parent.appendChild(element);
-    return element;
+  const teamSelect = document.getElementById("csa-team-select");
+  if (!loadButton || !status || !results || !teamSelect) {
+    console.error("Player stats elements were not found.");
+    return;
   }
-
   async function loadStats() {
-    results.replaceChildren();
     status.textContent = "Loading player stats...";
+    results.replaceChildren();
     loadButton.disabled = true;
-    loadButton.textContent = "Loading...";
-
     try {
-      const teamId = teamSelect.value;
       const url =
-        "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/"
-        + teamId + "/leaders";
-
+        "https://api.server.nbaapi.com/api/playertotals?season=2025&page=1&pageSize=100&sortBy=points&ascending=false&team=" +
+        encodeURIComponent(teamSelect.value);
       const response = await fetch(url);
-      if (!response.ok) throw new Error("Stats unavailable");
-
+      if (!response.ok) {
+        throw new Error("Stats request failed: " + response.status);
+      }
       const data = await response.json();
-      const categories = data.leaders || [];
-
-      if (!categories.length) {
+      const players = Array.isArray(data.data) ? data.data : [];
+      if (players.length === 0) {
         status.textContent =
-          "No player leaders are available for this team right now. Try again later.";
+          "No player stats found for this team. Try another team.";
         return;
       }
-
-      let count = 0;
-
-      categories.forEach(function (category) {
-        const leader = (category.leaders || [])[0];
-        if (!leader) return;
-
-        const athlete = leader.athlete || {};
-        const playerName =
-          athlete.displayName || athlete.fullName || "Unknown player";
-        const statName =
-          category.displayName || category.name || "Statistic";
-        const statValue =
-          leader.displayValue !== undefined
-            ? leader.displayValue
-            : leader.value !== undefined
-              ? leader.value
-              : "—";
-
+      const heading = document.createElement("h3");
+      heading.textContent = "Player Leaders";
+      heading.style.color = "#ff8a24";
+      results.appendChild(heading);
+      players.slice(0, 10).forEach(function (player) {
         const card = document.createElement("div");
         card.style.cssText =
-          "padding:14px 0;border-top:1px solid #333;";
-
-        addText(card, "div", statName.toUpperCase(), 
-          "font-size:12px;color:#ff8a24;font-weight:bold;");
-
-        addText(card, "div", playerName,
-          "font-size:18px;font-weight:bold;margin-top:6px;");
-
-        addText(card, "div", String(statValue),
-          "font-size:15px;color:#ddd;margin-top:4px;");
-
+          "padding:14px 0;border-top:1px solid #333;color:#fff;";
+        const name = document.createElement("strong");
+        name.textContent = player.playerName || "Unknown player";
+        card.appendChild(name);
+        const details = document.createElement("p");
+        details.style.color = "#aaa";
+        details.textContent =
+          (player.position || "Position unavailable") +
+          " • " + (player.games ?? "—") + " games";
+        card.appendChild(details);
+        const stats = document.createElement("p");
+        stats.style.whiteSpace = "pre-line";
+        stats.textContent =
+          "PTS: " + (player.points ?? "—") +
+          " | REB: " + (player.totalRb ?? "—") +
+          " | AST: " + (player.assists ?? "—") +
+          "\nSTL: " + (player.steals ?? "—") +
+          " | BLK: " + (player.blocks ?? "—");
+        card.appendChild(stats);
         results.appendChild(card);
-        count++;
       });
-
-      status.textContent = count
-        ? "Available team statistical leaders"
-        : "No player stats were returned. Try another team or check back later.";
-
-    } catch (error) {
       status.textContent =
-        "Stats couldn't load. The data source may be unavailable. Try again later.";
+        "Showing the top " + Math.min(players.length, 10) +
+        " players for " +
+        teamSelect.options[teamSelect.selectedIndex].text +
+        " (2024–25 season).";
+    } catch (error) {
+      console.error("Player stats error:", error);
+      status.textContent =
+        "Stats couldn't load. Check your connection or try again later.";
     } finally {
       loadButton.disabled = false;
-      loadButton.textContent = "Load Player Stats";
     }
   }
-
   loadButton.addEventListener("click", loadStats);
 })();
 </script>
