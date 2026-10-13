@@ -659,10 +659,9 @@ const url =
       loadButton.disabled = false;
     }
   }
-  loadButton.addEventListener("click", function () {
-  status.textContent = "Button works! Starting player stats...";
-  loadStats();
-});
+  
+loadButton.addEventListener("click", loadStats);
+
 })();
 </script>
 
