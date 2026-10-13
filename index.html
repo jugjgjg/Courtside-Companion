@@ -593,9 +593,11 @@ function renderRecords() {
     results.replaceChildren();
     loadButton.disabled = true;
     try {
-      const url =
-"https://api.server.nbaapi.com/api/playertotals?season=2026&page=1
+      
+const url =
+  "https://api.server.nbaapi.com/api/playertotals?season=2026&page=1&pageSize=10&sortBy=points&ascending=false&team=" +
   encodeURIComponent(teamSelect.value);
+
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Stats request failed: " + response.status);
@@ -648,7 +650,7 @@ function renderRecords() {
         "Showing the top " + Math.min(players.length, 10) +
         " players for " +
         teamSelect.options[teamSelect.selectedIndex].text +
-        " (2024–25 season).";
+        " (2025–26 season).";
     } catch (error) {
       console.error("Player stats error:", error);
       status.textContent =
